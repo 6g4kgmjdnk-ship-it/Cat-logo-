@@ -1,181 +1,323 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Andr4sClub</title>
-  <style>
-    :root {
-      --negro: #000;
-      --blanco: #fff;
-      --amarillo: #ffd91a;
-      --rojo: #a31d14;
-      --gris: #111;
-      --fuente: "Courier New", Courier, monospace;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Andr4sClub</title>
+<style>
+  :root {
+    --fondo: #000;
+    --amarillo: #ffd60a;
+    --apagado: #8a7300;
+    --panel: #111;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--fondo); color: var(--amarillo); }
+  body {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 14px;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+  }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Cabecera fija: menú | logo | carrito */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--fondo);
+    display: grid;
+    grid-template-columns: 56px 1fr 56px;
+    align-items: center;
+    padding: 14px 14px 10px;
+    padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+  .icono {
+    background: none;
+    border: 0;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+  }
+  .icono:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .barras { width: 30px; display: flex; flex-direction: column; gap: 7px; }
+  .barras span { display: block; height: 5px; background: var(--amarillo); border-radius: 3px; }
+  .carrito { width: 36px; height: 36px; }
+  .logo-caja { text-align: center; }
+  .logo { height: 64px; max-width: 100%; object-fit: contain; display: inline-block; }
+  .logo-texto { font-size: 22px; font-weight: 700; letter-spacing: .2em; }
 
-    html, body {
-      background: var(--negro);
-      color: var(--amarillo);
-      font-family: var(--fuente);
-    }
+  #cuenta { text-align: center; padding: 4px 12px 10px; font-size: 12px; letter-spacing: .15em; color: var(--apagado); }
+  #cuenta b { color: var(--amarillo); }
 
-    /* Barra roja de arriba */
-    .barra {
-      height: 8px;
-      background: var(--rojo);
-    }
+  /* Cuadrícula de 2 columnas */
+  #grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 12px;
+    row-gap: 34px;
+    padding: 14px 12px 40px;
+  }
+  .card { display: flex; flex-direction: column; min-width: 0; }
+  .foto, .sin-foto {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: var(--panel);
+    display: block;
+  }
+  .foto { object-fit: cover; }
+  .sin-foto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--apagado);
+    font-size: 12px;
+    letter-spacing: .15em;
+  }
+  .nombre {
+    margin-top: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .2em;
+    line-height: 1.9;
+    font-size: 14px;
+  }
+  .precio {
+    text-align: center;
+    letter-spacing: .2em;
+    line-height: 1.9;
+    font-size: 14px;
+  }
+  .tallas { text-align: center; color: var(--apagado); font-size: 12px; letter-spacing: .15em; margin-top: 2px; }
+  .pedir {
+    margin-top: 14px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var(--amarillo);
+    background: transparent;
+    border: 3px solid var(--amarillo);
+    padding: 16px 6px;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: .2em;
+    line-height: 1.6;
+  }
+  .pedir:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .agotado .foto, .agotado .sin-foto { opacity: .35; }
+  .agotado .pedir { border-color: var(--apagado); color: var(--apagado); pointer-events: none; }
 
-    /* Header: menú, logo, carrito */
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: var(--negro);
-    }
+  #mensaje { padding: 30px 16px; text-align: center; letter-spacing: .1em; line-height: 1.7; }
+  footer { padding: 10px 12px 40px; text-align: center; color: var(--apagado); font-size: 12px; letter-spacing: .15em; }
 
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      width: 36px;
-      background: none;
-      border: 0;
-      cursor: pointer;
-    }
-    .menu span {
-      display: block;
-      height: 5px;
-      border-radius: 3px;
-      background: var(--amarillo);
-    }
+  /* Menú lateral */
+  #velo { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 20; display: none; }
+  #menu {
+    position: fixed; top: 0; bottom: 0; left: 0;
+    width: 78%; max-width: 320px;
+    background: var(--fondo);
+    border-right: 3px solid var(--amarillo);
+    z-index: 21;
+    padding: 28px 22px;
+    padding-top: calc(28px + env(safe-area-inset-top, 0px));
+    transform: translateX(-105%);
+    transition: transform .25s ease;
+  }
+  body.menu-abierto #menu { transform: translateX(0); }
+  body.menu-abierto #velo { display: block; }
+  #menu a, #menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: 0;
+    color: var(--amarillo);
+    font-family: inherit;
+    font-size: 16px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--apagado);
+    cursor: pointer;
+  }
 
-    .logo img {
-      display: block;
-      height: 52px;
-      width: auto;
-    }
-
-    .carrito {
-      background: none;
-      border: 0;
-      cursor: pointer;
-      color: var(--amarillo);
-    }
-    .carrito svg { width: 38px; height: 38px; display: block; }
-
-    /* Cuadrícula de productos */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 28px 12px;
-      padding: 16px 12px 48px;
-    }
-
-    .producto {
-      text-align: center;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .foto {
-      aspect-ratio: 4 / 5;
-      background: var(--gris);
-      overflow: hidden;
-    }
-    .foto img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .nombre {
-      margin-top: 14px;
-      font-size: 15px;
-      line-height: 1.6;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .precio {
-      margin-top: 4px;
-      font-size: 15px;
-      letter-spacing: 0.08em;
-    }
-
-    .producto:focus-visible,
-    .menu:focus-visible,
-    .carrito:focus-visible {
-      outline: 2px solid var(--blanco);
-      outline-offset: 4px;
-    }
-
-    @media (min-width: 700px) {
-      .grid {
-        grid-template-columns: repeat(4, 1fr);
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-    }
-  </style>
+  @media (prefers-reduced-motion: reduce) { #menu { transition: none; } }
+  @media (min-width: 800px) {
+    #grid { grid-template-columns: repeat(4, 1fr); max-width: 1100px; margin: 0 auto; }
+  }
+</style>
 </head>
 <body>
 
-  <div class="barra"></div>
+<header>
+  <button class="icono" id="abrir" aria-label="Abrir menú">
+    <span class="barras"><span></span><span></span><span></span></span>
+  </button>
+  <div class="logo-caja">
+    <img class="logo" id="logo" src="logo.jpeg" alt="Andr4s Club">
+  </div>
+  <a class="icono" id="carrito" aria-label="Hacer un pedido por WhatsApp" target="_blank" rel="noopener">
+    <svg class="carrito" viewBox="0 0 36 36" fill="none" stroke="#ffd60a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2 4h6l4 18h16l4-13H10"/>
+      <circle cx="14" cy="30" r="2.2" fill="#ffd60a"/>
+      <circle cx="27" cy="30" r="2.2" fill="#ffd60a"/>
+    </svg>
+  </a>
+</header>
 
-  <header class="header">
-    <button class="menu" aria-label="Abrir menú">
-      <span></span><span></span><span></span>
-    </button>
+<div id="cuenta"></div>
 
-    <a class="logo" href="./">
-      <!-- CAMBIA logo.png por el nombre real de tu logo en GitHub -->
-      <img src="logo.png" alt="Andr4sClub">
-    </a>
+<main>
+  <div id="mensaje">Cargando…</div>
+  <div id="grid"></div>
+</main>
 
-    <button class="carrito" aria-label="Ver carrito">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 3h3l2.4 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.5L21 7H6"/>
-        <circle cx="10" cy="20.5" r="1.3" fill="currentColor"/>
-        <circle cx="18" cy="20.5" r="1.3" fill="currentColor"/>
-      </svg>
-    </button>
-  </header>
+<footer id="pie"></footer>
 
-  <main class="grid">
+<div id="velo"></div>
+<nav id="menu" aria-label="Menú">
+  <button id="cerrar">Cerrar</button>
+  <a id="m-whatsapp" target="_blank" rel="noopener">WhatsApp</a>
+  <a id="m-instagram" target="_blank" rel="noopener" style="display:none">Instagram</a>
+  <a id="m-tiktok" target="_blank" rel="noopener" style="display:none">TikTok</a>
+</nav>
 
-    <!-- Producto de prueba. En el paso 2 estos se llenan solos desde products.json -->
-    <a class="producto" href="#">
-      <div class="foto"><img src="images/producto1.jpg" alt="" onerror="this.style.display='none'"></div>
-      <p class="nombre">Camiseta Andr4s [Negra]</p>
-      <p class="precio">$80.000</p>
-    </a>
+<script>
+(function () {
+  var grid = document.getElementById("grid");
+  var mensaje = document.getElementById("mensaje");
 
-    <a class="producto" href="#">
-      <div class="foto"><img src="images/producto2.jpg" alt="" onerror="this.style.display='none'"></div>
-      <p class="nombre">Camiseta Andr4s [Blanca]</p>
-      <p class="precio">$80.000</p>
-    </a>
+  function precioCOP(n) { return "$" + Number(n).toLocaleString("es-CO"); }
 
-    <a class="producto" href="#">
-      <div class="foto"><img src="images/producto3.jpg" alt="" onerror="this.style.display='none'"></div>
-      <p class="nombre">Camiseta Andr4s [Gris]</p>
-      <p class="precio">$80.000</p>
-    </a>
+  function mostrarError(texto) {
+    mensaje.textContent = texto;
+    mensaje.style.display = "block";
+  }
 
-    <a class="producto" href="#">
-      <div class="foto"><img src="images/producto4.jpg" alt="" onerror="this.style.display='none'"></div>
-      <p class="nombre">Camiseta Andr4s [Beige]</p>
-      <p class="precio">$80.000</p>
-    </a>
+  // Si no existe logo.jpeg, se muestra el nombre en texto
+  document.getElementById("logo").onerror = function () {
+    var t = document.createElement("div");
+    t.className = "logo-texto";
+    t.textContent = "ANDR4S CLUB";
+    this.replaceWith(t);
+  };
 
-  </main>
+  // Menú lateral
+  function menu(abierto) { document.body.classList.toggle("menu-abierto", abierto); }
+  document.getElementById("abrir").onclick = function () { menu(true); };
+  document.getElementById("cerrar").onclick = function () { menu(false); };
+  document.getElementById("velo").onclick = function () { menu(false); };
 
+  function iniciarCuenta(fechaTexto) {
+    var cuenta = document.getElementById("cuenta");
+    var destino = new Date(fechaTexto).getTime();
+    if (!fechaTexto || isNaN(destino)) { cuenta.style.display = "none"; return; }
+    function tick() {
+      var resta = destino - Date.now();
+      if (resta <= 0) { cuenta.textContent = "DROP DISPONIBLE"; return; }
+      var d = Math.floor(resta / 86400000);
+      var h = Math.floor(resta / 3600000) % 24;
+      var m = Math.floor(resta / 60000) % 60;
+      var s = Math.floor(resta / 1000) % 60;
+      cuenta.innerHTML = "PRÓXIMO DROP EN <b>" + d + "d " + h + "h " + m + "m " + s + "s</b>";
+    }
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  function crearTarjeta(p, whatsapp) {
+    var card = document.createElement("article");
+    card.className = "card" + (p.agotado ? " agotado" : "");
+
+    function sinFoto(texto) {
+      var v = document.createElement("div");
+      v.className = "sin-foto";
+      v.textContent = texto;
+      return v;
+    }
+
+    if (p.foto) {
+      var img = document.createElement("img");
+      img.className = "foto";
+      img.loading = "lazy";
+      img.alt = p.nombre || "";
+      img.src = p.foto;
+      img.onerror = function () { img.replaceWith(sinFoto("FOTO NO ENCONTRADA")); };
+      card.appendChild(img);
+    } else {
+      card.appendChild(sinFoto("SIN FOTO"));
+    }
+
+    var nombre = document.createElement("div");
+    nombre.className = "nombre";
+    nombre.textContent = p.nombre || "Sin nombre";
+    card.appendChild(nombre);
+
+    var precio = document.createElement("div");
+    precio.className = "precio";
+    precio.textContent = precioCOP(p.precio || 0);
+    card.appendChild(precio);
+
+    if (p.tallas && p.tallas.length) {
+      var t = document.createElement("div");
+      t.className = "tallas";
+      t.textContent = "Tallas: " + p.tallas.join(" / ");
+      card.appendChild(t);
+    }
+
+    var boton = document.createElement("a");
+    boton.className = "pedir";
+    if (p.agotado) {
+      boton.textContent = "Agotado";
+    } else {
+      boton.textContent = "Pedir por WhatsApp";
+      var texto = "Hola Andr4sClub, quiero pedir: " + p.nombre + " (" + precioCOP(p.precio || 0) + ")";
+      boton.href = "https://wa.me/" + whatsapp + "?text=" + encodeURIComponent(texto);
+      boton.target = "_blank";
+      boton.rel = "noopener";
+    }
+    card.appendChild(boton);
+    return card;
+  }
+
+  fetch("products.json", { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("No se encontró products.json");
+      return r.json();
+    })
+    .then(function (datos) {
+      document.title = datos.marca || "Andr4sClub";
+      document.getElementById("pie").textContent = datos.pie || "";
+      iniciarCuenta(datos.fecha_drop);
+
+      var wa = "https://wa.me/" + datos.whatsapp + "?text=" + encodeURIComponent("Hola Andr4sClub, quiero hacer un pedido");
+      document.getElementById("carrito").href = wa;
+      document.getElementById("m-whatsapp").href = wa;
+
+      var redes = datos.redes || {};
+      ["instagram", "tiktok"].forEach(function (r) {
+        if (redes[r]) {
+          var a = document.getElementById("m-" + r);
+          a.href = redes[r];
+          a.style.display = "block";
+        }
+      });
+
+      var lista = datos.productos || [];
+      if (!lista.length) { mostrarError("Aún no hay productos."); return; }
+
+      mensaje.style.display = "none";
+      lista.forEach(function (p) { grid.appendChild(crearTarjeta(p, datos.whatsapp)); });
+    })
+    .catch(function (e) {
+      mostrarError("Error al cargar el catálogo: " + e.message + ". Revisa que products.json no tenga una coma de más o de menos.");
+    });
+})();
+</script>
 </body>
 </html>
