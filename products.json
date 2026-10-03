@@ -1,0 +1,36 @@
+{
+  "marca": "ANDR4S CLUB",
+  "whatsapp": "573116723104",
+  "fecha_drop": "",
+  "pie": "Cartagena, Colombia",
+  "redes": {
+    "instagram": "",
+    "tiktok": ""
+  },
+  "productos": [
+    {
+      "nombre": "Camiseta ciudad azul negra",
+      "precio": 80000,
+      "foto": "IMG_0001.jpeg",
+      "agotado": false
+    },
+    {
+      "nombre": "Camiseta ciudad azul blanca",
+      "precio": 80000,
+      "foto": "IMG_0002.jpeg",
+      "agotado": false
+    },
+    {
+      "nombre": "Camiseta corona negra",
+      "precio": 80000,
+      "foto": "IMG_0003.jpeg",
+      "agotado": false
+    },
+    {
+      "nombre": "Short jean crema",
+      "precio": 90000,
+      "foto": "IMG_0004.jpeg",
+      "agotado": false
+    }
+  ]
+}
